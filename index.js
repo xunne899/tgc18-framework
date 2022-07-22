@@ -12,9 +12,11 @@ app.use(express.static('public'))
 // setup wax-on
 wax.on(hbs.handlebars);
 
-app.get('/', async function(req,res){
-    res.send("hello world")
-})
+const landingRoutes = require('./routes/landing');
+
+app.use(landingRoutes)
+
+
 
 app.listen(3000, function(){
     console.log("Server has started");
