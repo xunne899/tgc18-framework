@@ -11,10 +11,16 @@ app.use(express.static('public'))
 
 // setup wax-on
 wax.on(hbs.handlebars);
+wax.setLayoutPath('./views/layouts')
 
 const landingRoutes = require('./routes/landing');
+const productRoutes = require('./routes/products');
 
-app.use(landingRoutes)
+app.use('/',landingRoutes)
+
+// ==> /xyz is a prefix can name anything to productRoutes
+// most important is to link to the correct const var--- productRoutes (***,productRoutes)
+app.use('/products',productRoutes);
 
 
 
