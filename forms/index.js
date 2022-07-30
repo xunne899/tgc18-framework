@@ -3,6 +3,7 @@ const forms = require('forms');
 // create some shortcuts
 const fields = forms.fields;
 const validators = forms.validators;
+const widgets = forms.widgets;
 
 const bootstrapField = function (name, object) {
     if (!Array.isArray(object.widget.classes)) { object.widget.classes = []; }
@@ -25,7 +26,7 @@ const bootstrapField = function (name, object) {
 };
 
 // this function will return an instance of the create product form
-const createProductForm = () => {
+const createProductForm = (mediaproperty,tags) => {
     // each key/value pair in the object represents one form control
     return forms.create({
         'title': fields.string({
@@ -56,8 +57,80 @@ const createProductForm = () => {
         'width': fields.string({
             required: true,
             errorAfterField: true
+        }),
+        'mediaproperty_id': fields.string({
+            label:'MediaProperty',
+            required: true,
+            errorAfterField: true,
+            choices: mediaproperty,
+            widget: widgets.select()
+        }),
+        'tags': fields.string({
+            required: true,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            widget: widgets.multipleSelect(),
+            choices:tags
+        })
+        })
+   
+}
+
+
+const createRegistrationForm = () => {
+    return forms.create({
+        'username': fields.string({
+            required: true,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            }
+        }),
+        'email': fields.string({
+            required: true,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            }
+        }),
+        'password': fields.password({
+            required: true,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            }
+        }),
+        'confirm_password': fields.password({
+            required: true,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            validators: [validators.matchField('password')]
         })
     })
 }
 
-module.exports = { createProductForm, bootstrapField}
+
+const createLoginForm = () => {
+    return forms.create({
+        'email': fields.string({
+            required: true,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            }
+        }),
+        'password': fields.password({
+            required: true,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            }
+        }),
+    })
+}
+
+module.exports = { createProductForm,createRegistrationForm,createLoginForm, bootstrapField}
