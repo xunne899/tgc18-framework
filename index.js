@@ -43,14 +43,26 @@ wax.setLayoutPath('./views/layouts')
 const landingRoutes = require('./routes/landing');
 const productRoutes = require('./routes/products');
 const userRoutes = require('./routes/users')
+const cloudinaryRoutes = require('./routes/cloudinary.js')
 
-app.use('/',landingRoutes)
+// app.use('/',landingRoutes)
 
-// ==> /xyz is a prefix can name anything to productRoutes
-// most important is to link to the correct const var--- productRoutes (***,productRoutes)
-app.use('/products',productRoutes);
-app.use('/users', userRoutes);
+// // ==> /xyz is a prefix can name anything to productRoutes
+// // most important is to link to the correct const var--- productRoutes (***,productRoutes)
+// app.use('/products',productRoutes);
+// app.use('/users', userRoutes);
 
+
+
+
+// async function main() {
+  // if the URL begins exactly with a forward slash
+  // use the landingRoutes
+  app.use('/', landingRoutes);
+  app.use('/products', productRoutes);
+  app.use('/users', userRoutes);
+  app.use('/cloudinary', cloudinaryRoutes);
+// }
 
 
 // Share the user data with hbs files
@@ -80,6 +92,8 @@ app.use(function(req,res,next){
 
 })
 
+
+// main()
 app.listen(3000, function(){
     console.log("Server has started");
 })

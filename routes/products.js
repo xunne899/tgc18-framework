@@ -31,7 +31,10 @@ router.get("/create", checkIfAuthenticated, async function (req, res) {
   res.render("products/create", {
     // get a HTML version of the form formatted using bootstrap
     form: productForm.toHTML(bootstrapField),
-  });
+      cloudinaryName: process.env.CLOUDINARY_NAME,
+      cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
+      cloudinaryPreset: process.env.CLOUDINARY_UPLOAD_PRESET
+  })
 });
 
 router.post("/create", checkIfAuthenticated, async function (req, res) {
@@ -113,6 +116,8 @@ router.get("/:product_id/update", async (req, res) => {
   productForm.fields.height.value = product.get("height");
   productForm.fields.width.value = product.get("width");
   productForm.fields.mediaproperty_id.value = product.get("mediaproperty_id");
+      // 1 - set the image url in the product form
+      productForm.fields.image_url.value = product.get('image_url');
 
   let selectedTags = await product.related("tags").pluck("id");
   productForm.fields.tags.value = selectedTags;
@@ -120,6 +125,10 @@ router.get("/:product_id/update", async (req, res) => {
   res.render("products/update", {
     form: productForm.toHTML(bootstrapField),
     product: product.toJSON(),
+            // 2 - send to the HBS file the cloudinary information
+            cloudinaryName: process.env.CLOUDINARY_NAME,
+            cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
+            cloudinaryPreset: process.env.CLOUDINARY_UPLOAD_PRESET
   });
 });
 

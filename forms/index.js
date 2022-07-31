@@ -73,6 +73,9 @@ const createProductForm = (mediaproperty,tags) => {
             },
             widget: widgets.multipleSelect(),
             choices:tags
+        }),
+        'image_url':fields.string({
+            widget: widgets.hidden()
         })
         })
    
