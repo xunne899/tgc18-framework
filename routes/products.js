@@ -5,24 +5,28 @@ const router = express.Router();
 const { Product, MediaProperty, Tag } = require("../models");
 const { createProductForm, bootstrapField } = require("../forms");
 
+// import in the CheckIfAuthenticated middleware
+const { checkIfAuthenticated } = require("../middlewares");
+
 router.get("/", async function (req, res) {
   // fetch all the products
   // use the bookshelf syntax
   // => select * from products
   let products = await Product.collection().fetch({
-    withRelated: ["mediaproperty",'tags'],
+    withRelated: ["mediaproperty", "tags"],
   });
   res.render("products/index.hbs", {
     products: products.toJSON(),
   });
 });
 
-router.get("/create", async function (req, res) {
+router.get("/create", checkIfAuthenticated, async function (req, res) {
   const allMediaProperty = await MediaProperty.fetchAll().map((mediaproperty) => {
     return [mediaproperty.get("id"), mediaproperty.get("name")];
   });
 
   const allTags = await Tag.fetchAll().map((tag) => [tag.get("id"), tag.get("name")]);
+
   const productForm = createProductForm(allMediaProperty, allTags);
   res.render("products/create", {
     // get a HTML version of the form formatted using bootstrap
@@ -30,11 +34,17 @@ router.get("/create", async function (req, res) {
   });
 });
 
-router.post("/create", async function (req, res) {
+router.post("/create", checkIfAuthenticated, async function (req, res) {
   const allMediaProperty = await MediaProperty.fetchAll().map((mediaproperty) => {
     return [mediaproperty.get("id"), mediaproperty.get("name")];
   });
-  const productForm = createProductForm(allMediaProperty);
+
+
+  const allTags = await Tag.fetchAll().map((tag) => [tag.get("id"), tag.get("name")]);
+
+  const productForm = createProductForm(allMediaProperty,allTags);
+
+
   productForm.handle(req, {
     success: async function (form) {
       // the success function is called if the form has no validation errors
@@ -46,7 +56,7 @@ router.post("/create", async function (req, res) {
       // The MODEL represents the table
       // ONE instance of the the MODEL represents a row
       // let {tags, ...productData} = form.data;
-      const product = new Product(form.data); // create a new instance of the Product model (i.e represents a new row)
+      const product = new Product(); // create a new instance of the Product model (i.e represents a new row)
       product.set("title", form.data.name);
       product.set("cost", form.data.cost);
       product.set("description", form.data.description);
@@ -57,10 +67,10 @@ router.post("/create", async function (req, res) {
       product.set("mediaproperty_id", form.data.mediaproperty_id);
       // must remeber to save
       await product.save();
-      if (tags) {
-        await product.tags().attach(tags.split(","));
+      if (form.data.tags) {
+        await product.tags().attach(form.data.tags.split(","));
       }
-      req.flash("success_messages", `New Product ${product.get('name')} has been created`)
+      req.flash("success_messages", `New Product ${product.get("title")} has been created`);
       res.redirect("/products");
     },
     error: function (form) {
@@ -140,7 +150,7 @@ router.post("/:product_id/update", async (req, res) => {
   const productForm = createProductForm(allMediaProperty);
   productForm.handle(req, {
     success: async (form) => {
-      let { tags, ...productData} = form.data;
+      let { tags, ...productData } = form.data;
       product.set(productData);
       product.save();
       // update the tags

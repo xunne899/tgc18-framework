@@ -1,6 +1,12 @@
 const express = require("express");
 const router = express.Router();
+const crypto = require('crypto');
 
+const getHashedPassword = (password) => {
+    const sha256 = crypto.createHash('sha256');
+    const hash = sha256.update(password).digest('base64');
+    return hash;
+}
 
 // import in the User model
 const { User } = require('../models');
@@ -22,7 +28,7 @@ router.post('/register', (req, res) => {
         success: async (form) => {
             const user = new User({
                 'username': form.data.username,
-                'password': form.data.password,
+                'password': getHashedPassword(form.data.password),
                 'email': form.data.email
             });
             await user.save();
@@ -47,62 +53,58 @@ router.get('/login', (req,res)=>{
 })
 
 
-
-router.post('/login', async (req, res) => {
+router.post('/login', async function(req,res){
     const loginForm = createLoginForm();
-    loginForm.handle(req, {
-        'success': async (form) => {
-            // process the login
-
-            // ...find the user by email and password
-            let user = await User.where({
-                'email': form.data.email
+    loginForm.handle(req,{
+        'success':async function(form){
+            const user = await User.where({
+                'email': form.data.email,
+                'password': getHashedPassword(form.data.password)
             }).fetch({
-               require:false}
-            );
-
-            if (!user) {
-                req.flash("error_messages", "Sorry, the authentication details you provided does not work.")
-                res.redirect('/users/login');
-            } else {
-                // check if the password matches
-                if (user.get('password') === form.data.password) {
-                    // add to the session that login succeed
-
-                    // store the user details
-                    req.session.user = {
-                        id: user.get('id'),
-                        username: user.get('username'),
-                        email: user.get('email')
-                    }
-                    req.flash("success_messages", "Welcome back, " + user.get('username'));
-                    res.redirect('/users/profile');
-                } else {
-                    req.flash("error_messages", "Sorry, the authentication details you provided does not work.")
-                    res.redirect('/users/login')
-                }
-            }
-        }, 'error': (form) => {
-            req.flash("error_messages", "There are some problems logging you in. Please fill in the form again")
-            res.render('users/login', {
-                'form': form.toHTML(bootstrapField)
+                require:false
             })
+            
+            // check if the user does not exist
+            if (!user) {
+                req.flash('error_messages', "Invalid credentials");
+                res.redirect("/users/login");
+            } else {
+                req.session.user = {
+                    id: user.get('id'),
+                    email: user.get('email'),
+                    username: user.get('username')
+                }
+                req.flash('success_messages', 'Welcome back, ' + user.get('username'));
+                res.redirect('/products');
+            }
         }
     })
 })
 
-router.get('/profile', (req, res) => {
+router.get('/profile', async function(req,res){
     const user = req.session.user;
     if (!user) {
-        req.flash('error_messages', 'You do not have permission to view this page');
-        res.redirect('/users/login');
+        req.flash('error_messages', 'Only logged in users may view this page');
+        res.redirect('/users/login')
     } else {
         res.render('users/profile',{
-            'user': user
+            user: req.session.user
         })
     }
-
 })
+
+// router.get('/profile', (req, res) => {
+//     const user = req.session.user;
+//     if (!user) {
+//         req.flash('error_messages', 'You do not have permission to view this page');
+//         res.redirect('/users/login');
+//     } else {
+//         res.render('users/profile',{
+//             'user': user
+//         })
+//     }
+
+// })
 
 
 
