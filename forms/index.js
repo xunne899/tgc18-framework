@@ -147,7 +147,7 @@ const createSearchForm = (mediaproperty, tags) => {
                 label: ['form-label']
             }
         }),
-        'min_cost': fields.string({
+        'min_cost': fields.number({
             required: false,
             errorAfterField: true,
             cssClasses: {
@@ -155,7 +155,7 @@ const createSearchForm = (mediaproperty, tags) => {
             },
             'validators': [validators.integer()]
         }),
-          'max_cost': fields.string({
+          'max_cost': fields.number({
             required: false,
             errorAfterField: true,
             cssClasses: {
@@ -164,7 +164,7 @@ const createSearchForm = (mediaproperty, tags) => {
             'validators': [validators.integer()]
         }),
 
-        'min_width': fields.string({
+        'min_width': fields.number({
             required: false,
             errorAfterField: true,
             cssClasses: {
@@ -172,7 +172,7 @@ const createSearchForm = (mediaproperty, tags) => {
             },
             'validators': [validators.integer()]
         }),
-          'max_width': fields.string({
+          'max_width': fields.number({
             required: false,
             errorAfterField: true,
             cssClasses: {
@@ -180,7 +180,7 @@ const createSearchForm = (mediaproperty, tags) => {
             },
             'validators': [validators.integer()]
         }),
-        'min_height': fields.string({
+        'min_height': fields.number({
             required: false,
             errorAfterField: true,
             cssClasses: {
@@ -188,7 +188,7 @@ const createSearchForm = (mediaproperty, tags) => {
             },
             'validators': [validators.integer()]
         }),
-          'max_height': fields.string({
+          'max_height': fields.number({
             required: false,
             errorAfterField: true,
             cssClasses: {

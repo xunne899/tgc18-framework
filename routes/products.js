@@ -3,7 +3,7 @@ const router = express.Router();
 
 // import in the Product model
 const { Product, MediaProperty, Tag } = require("../models");
-const { createProductForm, bootstrapField } = require("../forms");
+const { createProductForm, createSearchForm, bootstrapField } = require('../forms');
 
 // import in the CheckIfAuthenticated middleware
 const { checkIfAuthenticated } = require("../middlewares");
@@ -13,17 +13,74 @@ router.get("/", async function (req, res) {
   const allMediaProperty = await MediaProperty.fetchAll().map((mediaproperty) => {
     return [mediaproperty.get("id"), mediaproperty.get("name")];
   });
+  allMediaProperty.unshift([0, '--- Any MediaProperty ---']);
 
   const allTags = await Tag.fetchAll().map((tag) => [tag.get("id"), tag.get("name")]);
   // fetch all the products
   // use the bookshelf syntax
+
+      // create an instance of the search form
+      const searchForm = createSearchForm(allMediaProperty,allTags);
+
+      // create a query builder
+      let query = Product.collection();
   // => select * from products
-  let products = await Product.collection().fetch({
-    withRelated: ["mediaproperty", "tags"],
-  });
-  res.render("products/index.hbs", {
-    products: products.toJSON(),
-  });
+  searchForm.handle(req, {
+    'success': async function (form) {
+        // if the user did provide the name
+        if (form.data.name) {
+            query.where('name', 'like', '%' + form.data.title + '%');
+        }
+
+        if (form.data.min_cost) {
+            query.where('cost', '>=', form.data.min_cost);
+        }
+
+        if (form.data.max_cost) {
+            query.where('cost', '<=',  form.data.max_cost);
+        }
+
+        if (form.data.mediaproperty_id && form.data.mediaproperty_id != "0") {
+            query.where('mediaproperty_id', '=', form.data.mediaproperty_id);
+        }
+
+        if (form.data.tags) {
+
+            // first arg: sql clause
+            // second arg: which table?
+            // third arg: one of the keys
+            // fourth arg: the key to join with
+            // eqv. SELECT * from products join products_tags ON
+            //              products.id = product_id
+            //              where tag_id IN (<selected tags ID>)
+            query.query('join', 'products_tags', 'products.id', 'product_id')
+             .where('tag_id', 'in', form.data.tags.split(','));
+        }
+
+        const products = await query.fetch({
+            withRelated:['tags', 'mediaproperty']
+        })
+
+        res.render('products/index', {
+            products: products.toJSON(),
+            form: form.toHTML(bootstrapField)
+        })
+    },
+    'empty': async function () {
+        const products = await query.fetch({
+            withRelated: ['tags', 'mediaproperty']
+        });
+
+        res.render('products/index', {
+            products: products.toJSON(),
+            form: searchForm.toHTML(bootstrapField)
+        })
+    },
+    'error': async function () {
+
+    }
+
+})
 });
 
 router.get("/create", checkIfAuthenticated, async function (req, res) {

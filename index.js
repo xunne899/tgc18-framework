@@ -19,7 +19,7 @@ require('dotenv').config();
 app.use(
   session({
     store: new FileStore(),
-    secret: "keyboard cat",
+    secret: process.env.SESSION_SECRET, // used to generate the session id
     resave: false,
     saveUninitialized: true,
   })
