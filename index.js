@@ -16,14 +16,14 @@ const app = express();
 require('dotenv').config();
 
 // set up sessions
-app.use(
-  session({
-    store: new FileStore(),
-    secret: process.env.SESSION_SECRET, // used to generate the session id
-    resave: false,
-    saveUninitialized: true,
-  })
-);
+// setup sessions
+app.use(session({
+  store: new FileStore(),  // we want to use files to store sessions
+  secret: process.env.SESSION_SECRET_KEY,// used to generate the session id
+  resave: false, // do we automatically recreate the session even if there is no change to it
+  saveUninitialized: true, // if a new browser connects do we create a new session
+}))
+
 
 app.use(flash());
 
@@ -75,7 +75,7 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.use(csrf());
+// app.use(csrf());
 
 app.use(function (err, req, res, next) {
   if (err && err.code == "EBADCSRFTOKEN") {
@@ -86,14 +86,17 @@ app.use(function (err, req, res, next) {
   }
 });
 
-app.use(function (req, res, next) {
+app.use(csrf());
+
+app.use(function(req,res,next){
+
   // the csrfToken function is avaliable because of `app.use(csrf())`
-  res.locals.csrfToken = req.csrfToken();
+  res.locals.csrfToken = req.csrfToken(); 
   console.log(req.csrfToken());
   next();
-});
 
+})
 // main()
-app.listen(3001, function () {
+app.listen(3000, function () {
   console.log("Server has started");
 });

@@ -164,38 +164,38 @@ const createSearchForm = (mediaproperty, tags) => {
             'validators': [validators.integer()]
         }),
 
-        'min_width': fields.number({
-            required: false,
-            errorAfterField: true,
-            cssClasses: {
-                label: ['form-label']
-            },
-            'validators': [validators.integer()]
-        }),
-          'max_width': fields.number({
-            required: false,
-            errorAfterField: true,
-            cssClasses: {
-                label: ['form-label']
-            },
-            'validators': [validators.integer()]
-        }),
-        'min_height': fields.number({
-            required: false,
-            errorAfterField: true,
-            cssClasses: {
-                label: ['form-label']
-            },
-            'validators': [validators.integer()]
-        }),
-          'max_height': fields.number({
-            required: false,
-            errorAfterField: true,
-            cssClasses: {
-                label: ['form-label']
-            },
-            'validators': [validators.integer()]
-        }), 
+        // 'min_width': fields.number({
+        //     required: false,
+        //     errorAfterField: true,
+        //     cssClasses: {
+        //         label: ['form-label']
+        //     },
+        //     'validators': [validators.integer()]
+        // }),
+        //   'max_width': fields.number({
+        //     required: false,
+        //     errorAfterField: true,
+        //     cssClasses: {
+        //         label: ['form-label']
+        //     },
+        //     'validators': [validators.integer()]
+        // }),
+        // 'min_height': fields.number({
+        //     required: false,
+        //     errorAfterField: true,
+        //     cssClasses: {
+        //         label: ['form-label']
+        //     },
+        //     'validators': [validators.integer()]
+        // }),
+        //   'max_height': fields.number({
+        //     required: false,
+        //     errorAfterField: true,
+        //     cssClasses: {
+        //         label: ['form-label']
+        //     },
+        //     'validators': [validators.integer()]
+        // }), 
         'mediaproperty_id': fields.string({
             label: 'MediaProperty',
             required: false,

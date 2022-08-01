@@ -7,15 +7,15 @@ const { createProductForm, createSearchForm, bootstrapField } = require('../form
 
 // import in the CheckIfAuthenticated middleware
 const { checkIfAuthenticated } = require("../middlewares");
+// import in the DAL
+const dataLayer = require('../dal/products')
 
 router.get("/", async function (req, res) {
 
-  const allMediaProperty = await MediaProperty.fetchAll().map((mediaproperty) => {
-    return [mediaproperty.get("id"), mediaproperty.get("name")];
-  });
+  const allMediaProperty = await dataLayer.getallMediaProperty();
   allMediaProperty.unshift([0, '--- Any MediaProperty ---']);
 
-  const allTags = await Tag.fetchAll().map((tag) => [tag.get("id"), tag.get("name")]);
+  const allTags = await dataLayer.getAllTags();
   // fetch all the products
   // use the bookshelf syntax
 
@@ -152,19 +152,12 @@ router.post("/create", checkIfAuthenticated, async function (req, res) {
 router.get("/:product_id/update", async (req, res) => {
   // retrieve the product
   const productId = req.params.product_id;
-  const product = await Product.where({
-    id: productId,
-  }).fetch({
-    require: true,
-    withRelated: ["tags"],
-  });
+  const product = await dataLayer.getProductByID(productId);
 
   // fetch all the tags
-  const allTags = await Tag.fetchAll().map((tag) => [tag.get("id"), tag.get("name")]);
+  const allTags = await dataLayer.getAllTags();
 
-  const allMediaProperty = await MediaProperty.fetchAll().map((mediaproperty) => {
-    return [mediaproperty.get("id"), mediaproperty.get("name")];
-  });
+  const allMediaProperty = await dataLayer.getallMediaProperty();
 
   const productForm = createProductForm(allMediaProperty, allTags);
 
@@ -204,10 +197,8 @@ router.get("/:product_id/update", async (req, res) => {
 
 // })
 router.post("/:product_id/update", async (req, res) => {
-  const allMediaProperty = await MediaProperty.fetchAll().map((mediaproperty) => {
-    return [mediaproperty.get("id"), mediaproperty.get("name")];
-  });
-
+  const allMediaProperty = await dataLayer.getallMediaProperty();
+  const tags = await dataLayer.getAllTags();
   // fetch the product that we want to update
   const product = await Product.where({
     id: req.params.product_id,
@@ -217,7 +208,7 @@ router.post("/:product_id/update", async (req, res) => {
   });
 
   // process the form
-  const productForm = createProductForm(allMediaProperty);
+  const productForm = createProductForm(allMediaProperty,tags );
   productForm.handle(req, {
     success: async (form) => {
       let { tags, ...productData } = form.data;
