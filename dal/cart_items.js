@@ -6,7 +6,7 @@ const getCart = async (userId) => {
             'user_id': userId
         }).fetch({
             require: false,
-            withRelated: ['product', 'product.category']
+            withRelated: ['products', 'products.mediaproperty']
         });
 }
 
