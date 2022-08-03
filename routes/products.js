@@ -84,11 +84,9 @@ router.get("/", async function (req, res) {
 });
 
 router.get("/create", checkIfAuthenticated, async function (req, res) {
-  const allMediaProperty = await MediaProperty.fetchAll().map((mediaproperty) => {
-    return [mediaproperty.get("id"), mediaproperty.get("name")];
-  });
+  const allMediaProperty = await dataLayer.getallMediaProperty();
 
-  const allTags = await Tag.fetchAll().map((tag) => [tag.get("id"), tag.get("name")]);
+  const allTags = await dataLayer.getAllTags();
 
   const productForm = createProductForm(allMediaProperty, allTags);
   res.render("products/create", {
@@ -100,13 +98,14 @@ router.get("/create", checkIfAuthenticated, async function (req, res) {
   });
 });
 
+
+
+
+
 router.post("/create", checkIfAuthenticated, async function (req, res) {
-  const allMediaProperty = await MediaProperty.fetchAll().map((mediaproperty) => {
-    return [mediaproperty.get("id"), mediaproperty.get("name")];
-  });
+  const allMediaProperty = await dataLayer.getallMediaProperty();
 
-  const allTags = await Tag.fetchAll().map((tag) => [tag.get("id"), tag.get("name")]);
-
+  const allTags = await dataLayer.getAllTags();
   const productForm = createProductForm(allMediaProperty, allTags);
 
   productForm.handle(req, {
@@ -121,7 +120,7 @@ router.post("/create", checkIfAuthenticated, async function (req, res) {
       // ONE instance of the the MODEL represents a row
       // let {tags, ...productData} = form.data;
       const product = new Product(); // create a new instance of the Product model (i.e represents a new row)
-      product.set("title", form.data.name);
+      product.set("title", form.data.title);
       product.set("cost", form.data.cost);
       product.set("description", form.data.description);
       product.set("date", form.data.date);
@@ -129,6 +128,7 @@ router.post("/create", checkIfAuthenticated, async function (req, res) {
       product.set("height", form.data.height);
       product.set("width", form.data.width);
       product.set("mediaproperty_id", form.data.mediaproperty_id);
+      product.set('image_url', form.data.image_url);
       // must remeber to save
       await product.save();
       if (form.data.tags) {

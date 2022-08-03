@@ -28,6 +28,13 @@ const getProductByID = async (productId) => {
     });
 }
 
+async function getAllProducts() {
+    return await Product.fetchAll({
+        withRelated:['tags', 'mediaproperty']
+    });
+}
+
+
 module.exports = {
-    getallMediaProperty, getAllTags, getProductByID
+    getallMediaProperty, getAllTags, getProductByID, getAllProducts
 }

@@ -121,16 +121,23 @@ var helpers = require("handlebars-helpers")({
   handlebars: hbs.handlebars,
 });
 
+const cors = require('cors');
+const jwt = require('jsonwebtoken');
+
+
 const session = require("express-session");
 const flash = require("connect-flash");
 const FileStore = require("session-file-store")(session);
 const csrf = require("csurf");
+
+
 
 const app = express();
 
 // enable env files
 require("dotenv").config();
 
+app.use(cors());
 // set up sessions
 // setup sessions
 app.use(
@@ -174,6 +181,10 @@ const checkoutRoutes = require("./routes/checkout");
 const { checkIfAuthenticated } = require("./middlewares");
 const { getCart } = require("./dal/carts");
 
+const api = {
+  products: require('./routes/api/products'),
+  users: require('./routes/api/users')
+}
 // app.use('/',landingRoutes)
 
 // // ==> /xyz is a prefix can name anything to productRoutes
@@ -190,6 +201,10 @@ app.use("/users", userRoutes);
 app.use("/cloudinary", cloudinaryRoutes);
 app.use("/cart", [checkIfAuthenticated], cartRoutes);
 app.use("/checkout", checkoutRoutes);
+
+// register api routes
+app.use('/api/products', express.json(), api.products);
+app.use('/api/users', express.json(), api.users);
 
 // }
 
@@ -224,7 +239,7 @@ app.use(function (req, res, next) {
 const csrfInstance = csrf();
 app.use(function (req, res, next) {
   // console.log("Checking for csrf exclusion");
-  if (req.url === "/checkout/process_payment") {
+  if (req.url === "/checkout/process_payment" || req.url.slice(0,5)=="/api/") {
     next();
   } else {
     csrfInstance(req, res, next);
