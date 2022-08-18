@@ -60,7 +60,7 @@ router.get("/", async function (req, res) {
         const products = await query.fetch({
             withRelated:['tags', 'mediaproperty']
         })
-
+        
         res.render('products/index', {
             products: products.toJSON(),
             form: form.toHTML(bootstrapField)

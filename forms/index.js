@@ -124,7 +124,8 @@ const createLoginForm = () => {
             errorAfterField: true,
             cssClasses: {
                 label: ['form-label']
-            }
+            },
+            validators: [validators.email()]
         }),
         'password': fields.password({
             required: true,
