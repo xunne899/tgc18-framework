@@ -81,7 +81,7 @@ const createProductForm = (mediaproperty,tags) => {
    
 }
 
-
+// register form
 const createRegistrationForm = () => {
     return forms.create({
         'username': fields.string({
